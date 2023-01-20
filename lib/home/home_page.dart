@@ -1,0 +1,130 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String? pesquisa;
+  int? offset;
+
+  Future<Map> getGifs() async {
+    http.Response response;
+    if (pesquisa == null) {
+      response = await http.get(Uri.parse(
+          "https://api.giphy.com/v1/gifs/trending?api_key=wusbFwUExpkztfjeMr3QRimPUc4kd1J9&limit=20&rating=G"));
+    } else {
+      response = await http.get(Uri.parse(
+          "https://api.giphy.com/v1/gifs/search?api_key=wusbFwUExpkztfjeMr3QRimPUc4kd1J9&q=$pesquisa&limit=19&offset=$offset&rating=G&lang=en"));
+    }
+    return json.decode(response.body);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getGifs().then((map) {
+      print(map);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Image.network(
+            "https://developers.giphy.com/branch/master/static/header-logo-0fec0225d189bc0eae27dac3e3770582.gif"),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                  labelText: "Pesquise aqui",
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                  ),
+                  border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white))),
+              style: const TextStyle(color: Colors.white, fontSize: 18.0),
+              textAlign: TextAlign.center,
+              onSubmitted: (String str) {
+                setState(() {
+                  pesquisa = str;
+                  offset = 0;
+                });
+              },
+            ),
+          ),
+          Expanded(
+              child: FutureBuilder(
+                  future: getGifs(),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.red,
+                          ),
+                        );
+                      case ConnectionState.none:
+                        return const Center(
+                          child: Text(
+                            'VAZIO',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        );
+                      default:
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text("ERRO NA REQUISIÇÃO",
+                                style: TextStyle(color: Colors.red)),
+                          );
+                        } else {
+                          return myWidget(context, snapshot);
+                        }
+                    }
+                  }))
+        ],
+      ),
+    );
+  }
+
+  int getTamanhoPesquisa(List tamanho) {
+    if (pesquisa == null) {
+      return tamanho.length;
+    } else {
+      return tamanho.length + 1;
+    }
+  }
+
+  Widget myWidget(BuildContext context, snapshot) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+          ),
+          itemCount: getTamanhoPesquisa(snapshot.data["data"]),
+          itemBuilder: (BuildContext context, int index) {
+            return Card(
+              color: Colors.amber,
+              child: Center(child: Text('$index')),
+            );
+          }),
+    );
+  }
+}
