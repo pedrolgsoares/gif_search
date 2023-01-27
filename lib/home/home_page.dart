@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
           "https://api.giphy.com/v1/gifs/trending?api_key=wusbFwUExpkztfjeMr3QRimPUc4kd1J9&limit=20&rating=G"));
     } else {
       response = await http.get(Uri.parse(
-          "https://api.giphy.com/v1/gifs/search?api_key=wusbFwUExpkztfjeMr3QRimPUc4kd1J9&q=$pesquisa&limit=19&offset=$offset&rating=G&lang=en"));
+          "https://api.giphy.com/v1/gifs/search?api_key=wusbFwUExpkztfjeMr3QRimPUc4kd1J9&q=$pesquisa&limit=20&offset=$offset&rating=G&lang=en"));
     }
     return json.decode(response.body);
   }
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget myWidget(BuildContext context, snapshot) {
+  Widget myWidget(BuildContext context, AsyncSnapshot snapshot) {
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -120,9 +120,9 @@ class _HomePageState extends State<HomePage> {
           ),
           itemCount: getTamanhoPesquisa(snapshot.data["data"]),
           itemBuilder: (BuildContext context, int index) {
-            return Card(
-              color: Colors.amber,
-              child: Center(child: Text('$index')),
+            return Image.network(
+              snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+              height: 300.00,
             );
           }),
     );
