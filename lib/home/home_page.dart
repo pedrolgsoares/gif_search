@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? pesquisa;
-  int? offset;
+  int offset = 0;
 
   Future<Map> getGifs() async {
     http.Response response;
@@ -116,14 +116,37 @@ class _HomePageState extends State<HomePage> {
       removeTop: true,
       child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-          ),
+              crossAxisCount: 3, crossAxisSpacing: 10.0, mainAxisSpacing: 10.0),
           itemCount: getTamanhoPesquisa(snapshot.data["data"]),
           itemBuilder: (BuildContext context, int index) {
-            return Image.network(
-              snapshot.data["data"][index]["images"]["fixed_height"]["url"],
-              height: 300.00,
-            );
+            if (pesquisa == null || index < snapshot.data["data"].length) {
+              return Image.network(
+                  snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+                  height: 300.00,
+                  fit: BoxFit.cover);
+            } else {
+              return GestureDetector(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 50.0,
+                    ),
+                    Text(
+                      "Carregar mais...",
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    )
+                  ],
+                ),
+                onTap: () {
+                  setState(() {
+                    offset += 20;
+                  });
+                },
+              );
+            }
           }),
     );
   }
