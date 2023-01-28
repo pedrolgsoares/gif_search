@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:gif_search/home/gifs_detalhes.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -120,10 +121,20 @@ class _HomePageState extends State<HomePage> {
           itemCount: getTamanhoPesquisa(snapshot.data["data"]),
           itemBuilder: (BuildContext context, int index) {
             if (pesquisa == null || index < snapshot.data["data"].length) {
-              return Image.network(
-                  snapshot.data["data"][index]["images"]["fixed_height"]["url"],
-                  height: 300.00,
-                  fit: BoxFit.cover);
+              return GestureDetector(
+                child: Image.network(
+                    snapshot.data["data"][index]["images"]["fixed_height"]
+                        ["url"],
+                    height: 300.00,
+                    fit: BoxFit.cover),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GifDetalhes(data: snapshot.data["data"][index])));
+                },
+              );
             } else {
               return GestureDetector(
                 child: Column(
