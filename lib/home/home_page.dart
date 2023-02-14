@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gif_search/home/gifs_detalhes.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +33,9 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     getGifs().then((map) {
-      print(map);
+      if (kDebugMode) {
+        print(map);
+      }
     });
   }
 
