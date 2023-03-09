@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:gif_search/home/gifs_detalhes.dart';
 import 'package:http/http.dart' as http;
+import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -106,7 +108,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   int getTamanhoPesquisa(List tamanho) {
-    if (pesquisa == null) {
+    if (pesquisa == null || pesquisa!.isEmpty) {
       return tamanho.length;
     } else {
       return tamanho.length + 1;
@@ -124,17 +126,25 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (BuildContext context, int index) {
             if (pesquisa == null || index < snapshot.data["data"].length) {
               return GestureDetector(
-                child: Image.network(
-                    snapshot.data["data"][index]["images"]["fixed_height"]
-                        ["url"],
-                    height: 300.00,
-                    fit: BoxFit.cover),
+                child: FadeInImage.memoryNetwork(
+                  placeholder: kTransparentImage,
+                  image: snapshot.data["data"][index]["images"]["fixed_height"]
+                      ["url"],
+                  height: 300,
+                ),
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
                               GifDetalhes(data: snapshot.data["data"][index])));
+                },
+                onLongPress: () async {
+                  await FlutterShare.share(
+                      title: snapshot.data["title"],
+                      text: 'TESTE DE APP',
+                      linkUrl: snapshot.data["images"]["fixed_height"]["url"],
+                      chooserTitle: snapshot.data["title"]);
                 },
               );
             } else {
