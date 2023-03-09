@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 class GifDetalhes extends StatelessWidget {
   const GifDetalhes({super.key, required this.data});
@@ -9,7 +10,17 @@ class GifDetalhes extends StatelessWidget {
       appBar: AppBar(
         title: Text(data["title"]),
         backgroundColor: Colors.black,
-        actions: const [Icon(Icons.share)],
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await FlutterShare.share(
+                    title: data["title"],
+                    text: 'TESTE DE APP   ',
+                    linkUrl: data["images"]["fixed_height"]["url"],
+                    chooserTitle: data["title"]);
+              },
+              icon: const Icon(Icons.share))
+        ],
       ),
       backgroundColor: Colors.black,
       body: Center(
